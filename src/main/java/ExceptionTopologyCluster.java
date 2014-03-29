@@ -1,19 +1,21 @@
 import backtype.storm.Config;
 import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
+import consumer.bolt.ExceptionBolt;
 import consumer.bolt.FileDumpBolt;
+import consumer.bolt.MailerBolt;
 import consumer.bolt.WordCountBolt;
 import nl.minvenj.nfi.storm.kafka.KafkaSpout;
 
 /**
  * User: tonymeng
- * Date: 3/27/14
+ * Date: 3/28/14
  */
-public class LogLineTopologyCluster {
+public class ExceptionTopologyCluster {
 
   public static void main(String[]args) throws Exception {
-    if (args == null || args.length != 2) {
-      throw new IllegalArgumentException("Expected: <zookeeper:port> <topic>");
+    if (args == null || args.length != 5) {
+      throw new IllegalArgumentException("Expected: <zookeeper:port> <topic> <gmailuser> <gmailpass> <targetaddress>");
     }
     String zkConnect = args[0];
     String topic = args[1];
@@ -29,10 +31,10 @@ public class LogLineTopologyCluster {
     KafkaSpout spout = new KafkaSpout();
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout("kafkaspout", spout);
-    builder.setBolt("countbolt", new WordCountBolt()).shuffleGrouping("kafkaspout");
-    builder.setBolt("filebolt", new FileDumpBolt("/tmp/filedump")).shuffleGrouping("kafkaspout");
-    builder.setBolt("filecountbolt", new FileDumpBolt("/tmp/filedumpcount")).shuffleGrouping("countbolt");
+    builder.setBolt("exceptionbolt", new ExceptionBolt()).shuffleGrouping("kafkaspout");
+    builder.setBolt("exceptionfilebolt", new FileDumpBolt("/tmp/exceptions")).shuffleGrouping("exceptionbolt");
+    builder.setBolt("exceptionmailbolt", new MailerBolt(args[2], args[3], args[4], "Exception Thrown")).shuffleGrouping("exceptionbolt");
 
-    StormSubmitter.submitTopology("loglinetopology", config, builder.createTopology());
+    StormSubmitter.submitTopology("exceptiontopology", config, builder.createTopology());
   }
 }

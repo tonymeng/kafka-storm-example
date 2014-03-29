@@ -11,13 +11,13 @@ The following is used to make this happen.
 3. Apache's Kafka
   * Note: Follow the [quickstart guide] (http://kafka.apache.org/documentation.html#quickstart) to get kafka up and running.
 
-Setup zookeeper and kafka as explained in the Apache Kafka [Quickstart Guide] (http://kafka.apache.org/documentation.html#quickstart). Once they are up and running and you're able to see messages arrive at the Consumer from the Producer, run LogLineTopology.java and you will see the messages get counted and dumped via WordCount. 
+Setup zookeeper and kafka as explained in the Apache Kafka [Quickstart Guide] (http://kafka.apache.org/documentation.html#quickstart). Once they are up and running and you're able to see messages arrive at the Consumer from the Producer, run TestTopology.java and you will see the messages get counted and dumped via WordCount.
 
 Kafka+Storm on EC2 Example
 -----
 
 ###Cluster Setup
-LogLineTopologyCluster was written to be deployed in a storm cluster. To do this, I have setup a cluster on EC2 (for free!) that looks like the following:
+TestTopologyCluster was written to be deployed in a storm cluster. To do this, I have setup a cluster on EC2 (for free!) that looks like the following:
 
 1. t1.micro - running zookeeper
   * Security Rule: Enabled inbound port: 2181
@@ -48,8 +48,8 @@ Once all of the nodes are talking to each other, the next task is to deploy a to
 
 1. Install storm (`brew install storm`).
 2. Updating configs in `~/.storm/storm.yaml`. These configs need to be updated with `nimbus.host: "<external nimbus ip>"`.
-3. Building LogLineTopologyCluster into a jar (with dependencies). Jar up LogLineTopologyCluster with all dependencies in the project (minus org.apache.storm:storm-core:0.9.1-incubating).
-4. Deploying using the command `storm jar <path/to/>storm-loglines.jar LogLineTopologyCluster <internal zookeeper ip>:2181 logs`
+3. Building TestTopologyCluster into a jar (with dependencies). Jar up TestTopologyCluster with all dependencies in the project (minus org.apache.storm:storm-core:0.9.1-incubating).
+4. Deploying using the command `storm jar <path/to/>storm-loglines.jar TestTopologyCluster <internal zookeeper ip>:2181 logs`
 
 Now the topology should be visible by typing `storm list`.
 

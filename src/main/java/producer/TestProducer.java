@@ -17,10 +17,14 @@ import java.util.Properties;
 public class TestProducer {
   public static void main(String[] args) throws Exception {
     String topic = "logs";
-    String target = "localhost";
+    String target = "s";
 
     Properties props = new Properties();
-    props.put("metadata.broker.list", "localhost:9092");
+    if (args != null && args.length > 0) {
+      props.put("metadata.broker.list", args[0] + ":9092");
+    } else {
+      props.put("metadata.broker.list", "localhost:9092");
+    }
     props.put("serializer.class", "kafka.serializer.StringEncoder");
     props.put("request.required.acks", "1");
 

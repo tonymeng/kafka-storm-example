@@ -47,6 +47,6 @@ public class FileDumpBolt extends BaseBasicBolt {
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-    outputFieldsDeclarer.declare(new Fields("word", "count"));
+
   }
 }
