@@ -10,6 +10,7 @@ import backtype.storm.tuple.Tuple;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -24,13 +25,24 @@ public class FileDumpBolt extends BaseBasicBolt {
     this.path = path;
   }
 
+  protected BufferedWriter getBw() {
+    return this.bw;
+  }
+
   @Override
   public void prepare(Map stormConf, TopologyContext context) {
     try {
       File dumpFile = new File(path);
+      if (!dumpFile.exists()) {
+        try {
+          dumpFile.createNewFile();
+        } catch (IOException ioe) {
+          throw new RuntimeException("Could not create file at path: " + path, ioe);
+        }
+      }
       bw = new BufferedWriter(new FileWriter(dumpFile));
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    } catch (IOException ioe) {
+      throw new RuntimeException("Could not establish a buffered writer at path: " + path, ioe);
     }
   }
 
@@ -38,10 +50,10 @@ public class FileDumpBolt extends BaseBasicBolt {
   public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector) {
     try {
       String word = new String((byte[]) tuple.getValue(0), "UTF-8");
-      bw.write(word + "\n");
-      bw.flush();
+      getBw().write(word + "\n");
+      getBw().flush();
     } catch (Exception e) {
-      throw new RuntimeException("Could not process tuple: " + tuple.toString(), e);
+      e.printStackTrace();
     }
   }
 

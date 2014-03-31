@@ -1,8 +1,7 @@
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
-import consumer.bolt.FileDumpBolt;
-import consumer.bolt.WordCountBolt;
+import consumer.bolt.*;
 import nl.minvenj.nfi.storm.kafka.KafkaSpout;
 
 /**
@@ -23,11 +22,11 @@ public class TestTopology {
     KafkaSpout spout = new KafkaSpout();
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout("kafkaspout", spout);
-    builder.setBolt("countbolt", new WordCountBolt()).shuffleGrouping("kafkaspout");
-    builder.setBolt("filebolt", new FileDumpBolt("/tmp/filedump")).shuffleGrouping("kafkaspout");
-    builder.setBolt("filecountbolt", new FileDumpBolt("/tmp/filedumpcount")).shuffleGrouping("countbolt");
-//    builder.setBolt("exceptionbolt", new ExceptionBolt()).shuffleGrouping("kafkaspout");
-//    builder.setBolt("exceptionfilebolt", new FileDumpBolt("/tmp/exceptions")).shuffleGrouping("exceptionbolt");
+//    builder.setBolt("countbolt", new WordCountBolt()).shuffleGrouping("kafkaspout");
+//    builder.setBolt("filebolt", new WordCountDumpBolt("/tmp/filedump")).shuffleGrouping("countbolt");
+
+    builder.setBolt("exceptionbolt", new ExceptionBolt()).shuffleGrouping("kafkaspout");
+    builder.setBolt("exceptionfilebolt", new FileDumpBolt("/tmp/exceptions")).shuffleGrouping("exceptionbolt");
 //    builder.setBolt("exceptionmailbolt", new MailerBolt(args[0], args[1], args[2], "Exception Thrown")).shuffleGrouping("exceptionbolt");
 
     LocalCluster cluster = new LocalCluster();

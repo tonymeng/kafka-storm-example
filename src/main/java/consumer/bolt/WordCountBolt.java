@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Basic word count, given a tuple, it will keep a count in memory of how many of that tuple it has seen.
+ * It will emit a value of <word, count>.
+ *
  * User: tonymeng
  * Date: 3/26/14
  */
@@ -25,17 +28,15 @@ public class WordCountBolt extends BaseBasicBolt {
       Integer count = counts.get(word);
       if (count == null)
         count = 0;
-      count++;
-      counts.put(word, count);
-      System.out.println(word + ":" + count);
-      basicOutputCollector.emit(new Values((word + ":" + count).getBytes(), count));
+      counts.put(word, ++count);
+      basicOutputCollector.emit(new Values(tuple.getValue(0), count));
     } catch (UnsupportedEncodingException uee) {
-      throw new RuntimeException("Could not translate tuple: " + tuple.toString(), uee);
+      uee.printStackTrace();
     }
   }
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-    outputFieldsDeclarer.declare(new Fields("word", "count"));
+    outputFieldsDeclarer.declare(new Fields("Word", "Count"));
   }
 }
