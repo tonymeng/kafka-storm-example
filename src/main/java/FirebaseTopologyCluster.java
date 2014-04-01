@@ -10,7 +10,7 @@ import nl.minvenj.nfi.storm.kafka.KafkaSpout;
  * User: tonymeng
  * Date: 3/31/14
  */
-public class StatsTopologyCluster {
+public class FirebaseTopologyCluster {
 
   public static void main(String[]args) throws Exception {
     if (args == null || args.length != 3) {
@@ -33,6 +33,7 @@ public class StatsTopologyCluster {
     builder.setSpout("kafkaspout", spout);
     builder.setBolt("countbolt", new WordCountBolt()).shuffleGrouping("kafkaspout");
     builder.setBolt("countfilebolt", new WordCountDumpBolt("/tmp/stats")).shuffleGrouping("countbolt");
+    // using '`' as a delimiter
     builder.setBolt("firebasebolt", new FirebaseBolt(firebaseNamespace, "`")).shuffleGrouping("countbolt");
 
     StormSubmitter.submitTopology("statstopology", config, builder.createTopology());

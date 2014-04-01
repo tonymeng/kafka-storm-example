@@ -21,7 +21,7 @@ public class WordCountDumpBolt extends FileDumpBolt {
       getBw().write(count + ":" + word + "\n");
       getBw().flush();
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new RuntimeException("Could not write tuple: " + tuple, e);
     }
   }
 }

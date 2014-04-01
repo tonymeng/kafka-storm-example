@@ -11,6 +11,10 @@ import nl.minvenj.nfi.storm.kafka.KafkaSpout;
 public class TestTopology {
 
   public static void main(String[]args) throws Exception {
+    if (args != null && args.length != 4) {
+      System.out.println("Usage: <gmailUser> <gmailPass> <toAddress> <firebaseNamespace>");
+      System.exit(1);
+    }
     Config config = new Config();
     config.setDebug(true);
 
@@ -22,12 +26,13 @@ public class TestTopology {
     KafkaSpout spout = new KafkaSpout();
     TopologyBuilder builder = new TopologyBuilder();
     builder.setSpout("kafkaspout", spout);
-//    builder.setBolt("countbolt", new WordCountBolt()).shuffleGrouping("kafkaspout");
-//    builder.setBolt("filebolt", new WordCountDumpBolt("/tmp/filedump")).shuffleGrouping("countbolt");
+    builder.setBolt("countbolt", new WordCountBolt()).shuffleGrouping("kafkaspout");
+    builder.setBolt("filebolt", new WordCountDumpBolt("/tmp/filedump")).shuffleGrouping("countbolt");
+    builder.setBolt("firebasebolt", new FirebaseBolt(args[3], "`")).shuffleGrouping("countbolt"); // using '`' as a delimiter
 
     builder.setBolt("exceptionbolt", new ExceptionBolt()).shuffleGrouping("kafkaspout");
     builder.setBolt("exceptionfilebolt", new FileDumpBolt("/tmp/exceptions")).shuffleGrouping("exceptionbolt");
-//    builder.setBolt("exceptionmailbolt", new MailerBolt(args[0], args[1], args[2], "Exception Thrown")).shuffleGrouping("exceptionbolt");
+    builder.setBolt("exceptionmailbolt", new MailerBolt(args[0], args[1], args[2], "Exception Thrown")).shuffleGrouping("exceptionbolt");
 
     LocalCluster cluster = new LocalCluster();
     cluster.submitTopology("myjobname", config, builder.createTopology());

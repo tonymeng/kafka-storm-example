@@ -38,8 +38,7 @@ public class TestProducer {
         if (input.equals("quit")) {
           break;
         }
-        KeyedMessage<String, String> data = new KeyedMessage<String, String>(topic, target, input);
-        producer.send(data);
+        producer.send(new KeyedMessage<String, String>(topic, target, input));
       }
     } finally {
       producer.close();
